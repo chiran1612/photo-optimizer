@@ -54,6 +54,7 @@ Railway will show you a configuration screen:
 - **Port:** `8080` (Railway will auto-detect)
 
 ### **Step 5: Deploy and Wait**
+
 1. **Click** "Deploy" button
 2. **Railway will:**
    - Pull your code from GitHub
