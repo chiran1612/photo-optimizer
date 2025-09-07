@@ -240,12 +240,16 @@ public class EditorController {
     @ResponseBody
     public ResponseEntity<List<TextRegion>> detectTextRegions(@PathVariable Long id) {
         try {
+            System.out.println("Detect text endpoint called for photo ID: " + id);
             Photo photo = photoService.getPhotoById(id);
             if (photo == null) {
+                System.out.println("Photo not found for ID: " + id);
                 return ResponseEntity.notFound().build();
             }
             
+            System.out.println("Photo found, file path: " + photo.getFilePath());
             List<TextRegion> textRegions = ocrService.detectTextRegions(photo.getFilePath());
+            System.out.println("Text regions detected: " + textRegions.size());
             return ResponseEntity.ok(textRegions);
             
         } catch (Exception e) {
