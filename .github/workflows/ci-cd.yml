@@ -54,16 +54,17 @@ jobs:
         comment_mode: create new
         fail_ci: false
         
-    - name: Code coverage
+    - name: Generate code coverage report
       run: mvn jacoco:report
       continue-on-error: true
       
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v3
       if: always()
       with:
-        file: target/site/jacoco/jacoco.xml
-        fail_ci_if_error: false
+        name: coverage-report
+        path: target/site/jacoco/
+        retention-days: 30
 
   # Job 2: Build and Package
   build:
