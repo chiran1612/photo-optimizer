@@ -23,7 +23,7 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Create app user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -S appuser && adduser -S -G appuser appuser
 
 # Set working directory
 WORKDIR /app
