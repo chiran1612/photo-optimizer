@@ -34,6 +34,7 @@ public class OCRService {
         try {
             // Try multiple possible tessdata paths
             String[] possiblePaths = {
+                "/app/tessdata",  // Railway container path
                 "./tessdata",
                 "tessdata",
                 System.getProperty("user.dir") + "/tessdata",
