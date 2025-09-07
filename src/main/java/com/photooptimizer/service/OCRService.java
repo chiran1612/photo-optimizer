@@ -179,14 +179,18 @@ public class OCRService {
     public List<TextRegion> detectTextRegions(String imagePath) {
         List<TextRegion> textRegions = new ArrayList<>();
         try {
+            System.out.println("Starting text region detection for: " + imagePath);
             File imageFile = new File(imagePath);
             if (!imageFile.exists()) {
+                System.out.println("Image file does not exist: " + imagePath);
                 return textRegions;
             }
             
             // Load image and get words with bounding boxes
             BufferedImage image = ImageIO.read(imageFile);
+            System.out.println("Image loaded successfully, size: " + image.getWidth() + "x" + image.getHeight());
             List<Word> words = tesseract.getWords(image, 1);
+            System.out.println("OCR completed, found " + words.size() + " words");
             
             for (Word word : words) {
                 if (word.getText() != null && !word.getText().trim().isEmpty()) {
