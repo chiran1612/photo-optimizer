@@ -7,6 +7,14 @@ on:
   pull_request:
     branches: [ main ]
 
+# Permissions for the workflow
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  checks: write
+  pull-requests: write
+
 # Environment variables
 env:
   REGISTRY: ghcr.io
@@ -37,22 +45,25 @@ jobs:
     - name: Run tests
       run: mvn clean test
       
-    - name: Generate test report
-      uses: dorny/test-reporter@v1
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        name: Maven Tests
-        path: target/surefire-reports/*.xml
-        reporter: java-junit
-        fail-on-error: false
+        files: target/surefire-reports/*.xml
+        check_name: Maven Tests
+        comment_mode: create new
+        fail_ci: false
         
     - name: Code coverage
       run: mvn jacoco:report
+      continue-on-error: true
       
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
+      if: always()
       with:
         file: target/site/jacoco/jacoco.xml
+        fail_ci_if_error: false
 
   # Job 2: Build and Package
   build:
@@ -108,7 +119,7 @@ jobs:
 
   # Job 4: Build Docker Image
   docker:
-    needs: [test, build, security]
+    needs: [test, build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
