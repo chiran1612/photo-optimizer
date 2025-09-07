@@ -512,11 +512,14 @@
         
         // Initialize Fabric.js canvas
         function initializeCanvas() {
+            console.log('Initializing canvas...');
             canvas = new fabric.Canvas('editor-canvas', {
                 backgroundColor: '#ffffff',
                 selection: true,
                 preserveObjectStacking: true
             });
+            
+            console.log('Canvas created:', canvas);
             
             // Add event listeners
             canvas.on('object:added', saveState);
@@ -528,6 +531,7 @@
             
             // Set initial state
             saveState();
+            console.log('Canvas initialized successfully');
         }
         
         // Load photo into canvas
@@ -587,10 +591,14 @@
         // Load canvas state from server
         async function loadCanvasState() {
             try {
+                console.log('Loading canvas state for photo ID:', photoId);
                 const response = await fetch(`/photo-optimizer/editor/state/${photoId}`);
+                console.log('Canvas state response status:', response.status);
                 if (response.ok) {
                     const state = await response.text();
                     return state ? JSON.parse(state) : null;
+                } else {
+                    console.log('Canvas state not found, starting fresh');
                 }
             } catch (error) {
                 console.error('Error loading canvas state:', error);
@@ -600,6 +608,7 @@
         
         // Tool selection
         function selectTool(tool) {
+            console.log('Tool selected:', tool);
             currentTool = tool;
             
             // Update active tool button
