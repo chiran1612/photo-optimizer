@@ -77,4 +77,8 @@ public class PhotoService {
     public Photo getPhotoById(Long id) {
         return photoRepository.findById(id).orElse(null);
     }
+    
+    public Photo savePhoto(Photo photo) {
+        return photoRepository.save(photo);
+    }
 }

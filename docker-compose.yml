@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  photo-optimizer:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/photo-optimizer/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add database service
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: photo_optimizer
+      POSTGRES_USER: photo_user
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

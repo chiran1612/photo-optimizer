@@ -43,6 +43,9 @@ public class Photo {
     
     private String googleDriveId;
     
+    @Column(columnDefinition = "TEXT")
+    private String canvasState;
+    
     // Constructors
     public Photo() {}
     
@@ -96,4 +99,7 @@ public class Photo {
     
     public String getGoogleDriveId() { return googleDriveId; }
     public void setGoogleDriveId(String googleDriveId) { this.googleDriveId = googleDriveId; }
+    
+    public String getCanvasState() { return canvasState; }
+    public void setCanvasState(String canvasState) { this.canvasState = canvasState; }
 }
