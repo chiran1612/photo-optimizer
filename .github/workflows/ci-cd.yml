@@ -51,8 +51,8 @@ jobs:
       with:
         files: target/surefire-reports/*.xml
         check_name: Maven Tests
-        comment_mode: create new
-        fail_ci: false
+        comment_mode: off
+        action_fail: false
         
     - name: Generate code coverage report
       run: mvn jacoco:report
