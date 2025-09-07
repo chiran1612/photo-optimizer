@@ -12,6 +12,10 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
+# Copy tessdata to a known location for the runtime stage
+RUN mkdir -p /app/tessdata && \
+    cp -r src/main/resources/tessdata/* /app/tessdata/ 2>/dev/null || true
+
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
 
@@ -36,7 +40,7 @@ RUN mkdir -p /app/data /app/logs /app/uploads /app/tessdata && \
     chown -R appuser:appuser /app
 
 # Copy tessdata
-COPY --from=build /app/src/main/resources/tessdata /app/tessdata
+COPY --from=build /app/tessdata /app/tessdata
 
 # Switch to app user
 USER appuser
