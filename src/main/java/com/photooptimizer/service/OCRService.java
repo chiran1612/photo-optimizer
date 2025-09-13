@@ -85,8 +85,12 @@ public class OCRService {
         // Set page segmentation mode for better text detection
         tesseract.setPageSegMode(6); // Assume a single uniform block of text
         
-        // Set timeout for OCR operations (30 seconds)
-        tesseract.setVariable("tessedit_timeout", "30");
+        // Set timeout for OCR operations (10 seconds for Railway)
+        tesseract.setVariable("tessedit_timeout", "10");
+        
+        // Set additional Railway-optimized settings
+        tesseract.setVariable("tessedit_pageseg_mode", "6");
+        tesseract.setVariable("tessedit_ocr_engine_mode", "1");
     }
     
     /**

@@ -55,8 +55,8 @@ USER appuser
 EXPOSE 8080
 
 # Health check with longer timeout for OCR operations
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8080/photo-optimizer/actuator/health || exit 1
 
 # Run application with JVM optimizations for Railway
-ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-Djava.awt.headless=true", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-Djava.awt.headless=true", "-Dfile.encoding=UTF-8", "-Duser.timezone=UTC", "-jar", "app.jar"]

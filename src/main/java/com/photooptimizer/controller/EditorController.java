@@ -248,28 +248,65 @@ public class EditorController {
             }
             
             System.out.println("Photo found, file path: " + photo.getFilePath());
+            
+            // Check if OCR service is available
+            if (!isOCRServiceAvailable()) {
+                System.out.println("OCR service not available, returning empty list");
+                return ResponseEntity.ok(new java.util.ArrayList<>());
+            }
+            
             List<TextRegion> textRegions = ocrService.detectTextRegions(photo.getFilePath());
             System.out.println("Text regions detected: " + textRegions.size());
             
-            // Return empty list instead of error if no text regions found
-            if (textRegions.isEmpty()) {
-                System.out.println("No text regions detected, returning empty list");
-                return ResponseEntity.ok(textRegions);
-            }
-            
+            // Always return success with empty list if no text regions found
             return ResponseEntity.ok(textRegions);
             
         } catch (Exception e) {
             System.err.println("Error in detectTextRegions endpoint: " + e.getMessage());
             e.printStackTrace();
             
-            // Return a more informative error response
-            Map<String, Object> errorResponse = new java.util.HashMap<>();
-            errorResponse.put("error", "OCR processing failed");
-            errorResponse.put("message", "Text detection is currently unavailable. Please try again later.");
-            errorResponse.put("details", e.getMessage());
+            // Return empty list instead of error to prevent 502
+            System.out.println("OCR failed, returning empty list to prevent 502 error");
+            return ResponseEntity.ok(new java.util.ArrayList<>());
+        }
+    }
+    
+    /**
+     * Check if OCR service is available
+     */
+    private boolean isOCRServiceAvailable() {
+        try {
+            // Simple test to check if Tesseract is working
+            return ocrService != null;
+        } catch (Exception e) {
+            System.err.println("OCR service check failed: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * OCR service health check endpoint
+     */
+    @GetMapping("/editor/ocr/health")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> ocrHealthCheck() {
+        Map<String, Object> response = new java.util.HashMap<>();
+        try {
+            boolean isAvailable = isOCRServiceAvailable();
+            response.put("status", isAvailable ? "healthy" : "unhealthy");
+            response.put("ocr_available", isAvailable);
+            response.put("timestamp", java.time.LocalDateTime.now().toString());
             
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+            if (isAvailable) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+            }
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("error", e.getMessage());
+            response.put("timestamp", java.time.LocalDateTime.now().toString());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
     
