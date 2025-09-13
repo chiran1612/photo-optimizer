@@ -458,4 +458,12 @@ public class EditorController {
                     .body("Error adding text: " + e.getMessage());
         }
     }
+    
+    /**
+     * Simple health check endpoint for debugging Railway deployment
+     */
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Application is running!");
+    }
 }
