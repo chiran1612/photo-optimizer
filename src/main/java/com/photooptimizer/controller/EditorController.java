@@ -481,4 +481,19 @@ public class EditorController {
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("pong");
     }
+    
+    /**
+     * Simple status endpoint for Railway debugging
+     */
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> status() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("status", "UP");
+        status.put("timestamp", System.currentTimeMillis());
+        status.put("application", "Photo Optimizer");
+        status.put("version", "1.0.0");
+        status.put("profile", System.getProperty("spring.profiles.active", "default"));
+        status.put("contextPath", System.getProperty("server.servlet.context-path", "/"));
+        return ResponseEntity.ok(status);
+    }
 }
