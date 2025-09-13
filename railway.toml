@@ -8,4 +8,8 @@ healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 
 [environments.production]
-variables = { TESSDATA_PREFIX = "/app/tessdata", TESSDATA_DIR = "/app/tessdata" }
+variables = { 
+  SPRING_PROFILES_ACTIVE = "production",
+  TESSDATA_PREFIX = "/app/tessdata", 
+  TESSDATA_DIR = "/app/tessdata" 
+}
