@@ -29,7 +29,8 @@ import java.io.File;
  * Photo Editor Controller
  * Handles photo editing operations and editor interface
  */
-@Controller
+@RestController
+@RequestMapping("/editor")
 public class EditorController {
     
     @Autowired
@@ -458,42 +459,5 @@ public class EditorController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error adding text: " + e.getMessage());
         }
-    }
-    
-    /**
-     * Simple health check endpoint for debugging Railway deployment
-     */
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> healthCheck() {
-        Map<String, Object> health = new HashMap<>();
-        health.put("status", "UP");
-        health.put("timestamp", System.currentTimeMillis());
-        health.put("application", "Photo Optimizer");
-        health.put("version", "1.0.0");
-        health.put("profile", System.getProperty("spring.profiles.active", "default"));
-        return ResponseEntity.ok(health);
-    }
-    
-    /**
-     * Additional health check endpoint for Railway
-     */
-    @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("pong");
-    }
-    
-    /**
-     * Simple status endpoint for Railway debugging
-     */
-    @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> status() {
-        Map<String, Object> status = new HashMap<>();
-        status.put("status", "UP");
-        status.put("timestamp", System.currentTimeMillis());
-        status.put("application", "Photo Optimizer");
-        status.put("version", "1.0.0");
-        status.put("profile", System.getProperty("spring.profiles.active", "default"));
-        status.put("contextPath", System.getProperty("server.servlet.context-path", "/"));
-        return ResponseEntity.ok(status);
     }
 }
