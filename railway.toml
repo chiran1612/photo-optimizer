@@ -1,0 +1,11 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "java -Xmx512m -Xms256m -Djava.awt.headless=true -jar app.jar"
+healthcheckPath = "/photo-optimizer/actuator/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+
+[environments.production]
+variables = { TESSDATA_PREFIX = "/app/tessdata", TESSDATA_DIR = "/app/tessdata" }

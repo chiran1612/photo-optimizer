@@ -35,29 +35,45 @@ public class OCRService {
             // Try multiple possible tessdata paths
             String[] possiblePaths = {
                 "/app/tessdata",  // Railway container path
+                System.getenv("TESSDATA_PREFIX"), // Environment variable
+                System.getenv("TESSDATA_DIR"), // Alternative environment variable
                 "./tessdata",
                 "tessdata",
                 System.getProperty("user.dir") + "/tessdata",
-                System.getProperty("user.dir") + "/src/main/resources/tessdata"
+                System.getProperty("user.dir") + "/src/main/resources/tessdata",
+                "/usr/share/tesseract-ocr/4.00/tessdata", // Ubuntu system path
+                "/usr/share/tesseract-ocr/tessdata" // Alternative Ubuntu path
             };
             
             boolean tessdataFound = false;
             for (String path : possiblePaths) {
-                try {
-                    tesseract.setDatapath(path);
-                    tessdataFound = true;
-                    System.out.println("Tessdata found at: " + path);
-                    break;
-                } catch (Exception e) {
-                    System.out.println("Tessdata not found at: " + path);
+                if (path != null && !path.isEmpty()) {
+                    try {
+                        java.io.File tessdataDir = new java.io.File(path);
+                        if (tessdataDir.exists() && tessdataDir.isDirectory()) {
+                            tesseract.setDatapath(path);
+                            tessdataFound = true;
+                            System.out.println("Tessdata found at: " + path);
+                            break;
+                        } else {
+                            System.out.println("Tessdata directory does not exist: " + path);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Tessdata not accessible at: " + path + " - " + e.getMessage());
+                    }
                 }
             }
             
             if (!tessdataFound) {
                 System.out.println("Warning: Tessdata not found, OCR may not work properly");
+                System.out.println("Available environment variables:");
+                System.out.println("TESSDATA_PREFIX: " + System.getenv("TESSDATA_PREFIX"));
+                System.out.println("TESSDATA_DIR: " + System.getenv("TESSDATA_DIR"));
+                System.out.println("Current working directory: " + System.getProperty("user.dir"));
             }
         } catch (Exception e) {
             System.out.println("Error setting tessdata path: " + e.getMessage());
+            e.printStackTrace();
         }
         
         // Set language to English (can be changed to other languages)
@@ -68,6 +84,9 @@ public class OCRService {
         
         // Set page segmentation mode for better text detection
         tesseract.setPageSegMode(6); // Assume a single uniform block of text
+        
+        // Set timeout for OCR operations (30 seconds)
+        tesseract.setVariable("tessedit_timeout", "30");
     }
     
     /**
@@ -189,8 +208,39 @@ public class OCRService {
             // Load image and get words with bounding boxes
             BufferedImage image = ImageIO.read(imageFile);
             System.out.println("Image loaded successfully, size: " + image.getWidth() + "x" + image.getHeight());
-            List<Word> words = tesseract.getWords(image, 1);
-            System.out.println("OCR completed, found " + words.size() + " words");
+            
+            // Check if Tesseract is properly initialized
+            if (tesseract == null) {
+                System.err.println("Tesseract is not properly initialized");
+                return textRegions;
+            }
+            
+            // Perform OCR with timeout handling
+            List<Word> words;
+            try {
+                words = tesseract.getWords(image, 1);
+                System.out.println("OCR completed, found " + words.size() + " words");
+            } catch (Exception ocrException) {
+                System.err.println("OCR processing failed: " + ocrException.getMessage());
+                ocrException.printStackTrace();
+                
+                // Try fallback method - simple text extraction
+                try {
+                    String fallbackText = tesseract.doOCR(image);
+                    if (fallbackText != null && !fallbackText.trim().isEmpty()) {
+                        // Create a single text region for the entire image
+                        TextRegion fallbackRegion = new TextRegion(
+                            fallbackText.trim(),
+                            0, 0, image.getWidth(), image.getHeight(), 50.0f
+                        );
+                        textRegions.add(fallbackRegion);
+                        System.out.println("Fallback OCR successful, created single text region");
+                    }
+                } catch (Exception fallbackException) {
+                    System.err.println("Fallback OCR also failed: " + fallbackException.getMessage());
+                }
+                return textRegions;
+            }
             
             for (Word word : words) {
                 if (word.getText() != null && !word.getText().trim().isEmpty()) {
@@ -209,6 +259,7 @@ public class OCRService {
             
         } catch (Exception e) {
             System.err.println("Error detecting text regions: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return textRegions;

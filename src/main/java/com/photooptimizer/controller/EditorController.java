@@ -238,7 +238,7 @@ public class EditorController {
      */
     @GetMapping("/editor/detect-text/{id}")
     @ResponseBody
-    public ResponseEntity<List<TextRegion>> detectTextRegions(@PathVariable Long id) {
+    public ResponseEntity<?> detectTextRegions(@PathVariable Long id) {
         try {
             System.out.println("Detect text endpoint called for photo ID: " + id);
             Photo photo = photoService.getPhotoById(id);
@@ -250,10 +250,26 @@ public class EditorController {
             System.out.println("Photo found, file path: " + photo.getFilePath());
             List<TextRegion> textRegions = ocrService.detectTextRegions(photo.getFilePath());
             System.out.println("Text regions detected: " + textRegions.size());
+            
+            // Return empty list instead of error if no text regions found
+            if (textRegions.isEmpty()) {
+                System.out.println("No text regions detected, returning empty list");
+                return ResponseEntity.ok(textRegions);
+            }
+            
             return ResponseEntity.ok(textRegions);
             
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Error in detectTextRegions endpoint: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return a more informative error response
+            Map<String, Object> errorResponse = new java.util.HashMap<>();
+            errorResponse.put("error", "OCR processing failed");
+            errorResponse.put("message", "Text detection is currently unavailable. Please try again later.");
+            errorResponse.put("details", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
         }
     }
     
