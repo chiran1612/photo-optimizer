@@ -3,7 +3,7 @@ builder = "dockerfile"
 
 [deploy]
 startCommand = "java -Xmx512m -Xms256m -Djava.awt.headless=true -jar app.jar"
-healthcheckPath = "/photo-optimizer/actuator/health"
+healthcheckPath = "/actuator/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 
