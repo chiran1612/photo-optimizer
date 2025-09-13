@@ -56,7 +56,7 @@ EXPOSE 8080
 
 # Health check with longer timeout for OCR operations
 HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || curl -f http://localhost:8080/health || exit 1
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Run application with JVM optimizations for Railway
 ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-Djava.awt.headless=true", "-Dfile.encoding=UTF-8", "-Duser.timezone=UTC", "-Dspring.profiles.active=production", "-jar", "app.jar"]

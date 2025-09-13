@@ -1,9 +1,0 @@
-com\photooptimizer\service\EditorService.class
-com\photooptimizer\service\PhotoService.class
-com\photooptimizer\controller\EditorController.class
-com\photooptimizer\PhotoOptimizerApplication.class
-com\photooptimizer\model\Photo.class
-com\photooptimizer\repository\PhotoRepository.class
-com\photooptimizer\service\OCRService$TextRegion.class
-com\photooptimizer\controller\PhotoController.class
-com\photooptimizer\service\OCRService.class

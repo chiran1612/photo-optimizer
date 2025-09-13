@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.awt.image.BufferedImage;
@@ -463,7 +464,21 @@ public class EditorController {
      * Simple health check endpoint for debugging Railway deployment
      */
     @GetMapping("/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Application is running!");
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        Map<String, Object> health = new HashMap<>();
+        health.put("status", "UP");
+        health.put("timestamp", System.currentTimeMillis());
+        health.put("application", "Photo Optimizer");
+        health.put("version", "1.0.0");
+        health.put("profile", System.getProperty("spring.profiles.active", "default"));
+        return ResponseEntity.ok(health);
+    }
+    
+    /**
+     * Additional health check endpoint for Railway
+     */
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
     }
 }
